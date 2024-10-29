@@ -23,5 +23,5 @@ else:
         print(" ### Eintritt Basis-Mitglied ### ")
         print(" Preis: ", preis_basis, " Euro ")
     else:
-         print(" ### Eintritt Erwachsene (voller Preis) ### ")
-         print(" Preis: ", preis_erwachsene, " Euro")
+        print(" ### Eintritt Erwachsene (voller Preis) ### ")
+        print(" Preis: ", preis_erwachsene, " Euro")
