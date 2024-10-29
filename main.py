@@ -19,10 +19,9 @@ else:
     if antwort_rabatt == "p":
         print(" ### Eintritt Premium-Mitglied ### ")
         print(" Preis: ", preis_premium, " Euro ")
-        if antwort_rabatt == "b":
-            print(" ### Eintritt Basis-Mitglied ### ")
-            print(" Preis: ", preis_basis, " Euro ")
-        else:
-            print(" ### Eintritt Erwachsene (voller Preis) ### ")
-            print(" Preis: ", preis_erwachsene, " Euro")
-
+    elif antwort_rabatt == "b":
+        print(" ### Eintritt Basis-Mitglied ### ")
+        print(" Preis: ", preis_basis, " Euro ")
+    else:
+         print(" ### Eintritt Erwachsene (voller Preis) ### ")
+         print(" Preis: ", preis_erwachsene, " Euro")
