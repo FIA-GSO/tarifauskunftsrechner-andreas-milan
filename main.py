@@ -1,91 +1,129 @@
-def berechne_tarif(alter, mitgliedschaft, ist_premium_erwachsener_sekt=False, ticket_dauer="ganztag"):
-    """
-    Berechnet den Tarif basierend auf Alter, Mitgliedschaftstyp und weiteren Optionen.
-    """
-    # Preis-Definitionen
-    kinderpreis = 2.5
-    jugendermäßigungspreis = 3.5
-    erwachsenenpreise = {
+# Sprachpaket für mehrsprachige Unterstützung
+languages = {
+    "en": {
+        "invalid_language": "Not a valid Language!",
+        "invalid_age": "Invalid age. Please try again.",
+        "invalid_input": "Invalid input. Please enter a valid age.",
+        "enter_age": "Please enter your age: ",
+        "membership_prompt": "Enter membership type (premium/basic/none): ",
+        "add_sekt": "Would you like to add a glass of sekt for €0.75? (yes/no): ",
+        "ticket_duration": "Choose ticket duration (half-day/full-day): ",
+        "invalid_option": "Invalid option. A full-day ticket is selected by default.",
+        "calculated_rate": "The calculated rate is: €",
+        "another_rate": "Would you like to calculate another rate? (yes/no): ",
+        "thank_you": "Thank you! We wish you a pleasant visit."
+    },
+    "de": {
+        "invalid_language": "Keine gültige Sprache!",
+        "invalid_age": "Ungültiges Alter. Bitte versuchen Sie es erneut.",
+        "invalid_input": "Ungültige Eingabe. Bitte geben Sie ein gültiges Alter ein.",
+        "enter_age": "Bitte geben Sie das Alter ein: ",
+        "membership_prompt": "Geben Sie die Mitgliedschaft an (premium/basis/keine): ",
+        "add_sekt": "Möchten Sie ein Glas Sekt für 0,75 € hinzufügen? (ja/nein): ",
+        "ticket_duration": "Wählen Sie die Ticketdauer (halbtags/ganztag): ",
+        "invalid_option": "Ungültige Option. Es wird standardmäßig ein Ganztagesticket ausgewählt.",
+        "calculated_rate": "Der berechnete Tarif beträgt: €",
+        "another_rate": "Möchten Sie einen weiteren Tarif abfragen? (ja/nein): ",
+        "thank_you": "Vielen Dank! Wir wünschen Ihnen einen angenehmen Besuch."
+    }
+}
+
+
+def calculate_rate(age, membership, is_premium_with_sekt=False, ticket_duration="full-day"):
+    # Preisdefinitionen
+    child_price = 2.5
+    youth_discount_price = 3.5
+    adult_prices = {
         "premium": 3,
-        "basis": 4,
-        "keine": 5
+        "basic": 4,
+        "none": 5
     }
-    tagesticket_preise = {
-        "erwachsener": {"ganztag": 10, "premium": 6, "basis": 8},
-        "kind": {"ganztag": 5},
-        "jugendlich": {"ganztag": 6}
+    day_ticket_prices = {
+        "child": {"full-day": 5},
+        "youth": {"full-day": 6},
+        "adult": {"full-day": 10, "premium": 6, "basic": 8}
     }
 
-    # Preisberechnung basierend auf Alter und Mitgliedschaft
-    if alter < 14:
-        preis = kinderpreis
-    elif 14 <= alter <= 17:
-        preis = jugendermäßigungspreis
+    # Preisberechnung basierend auf dem Alter und der Mitgliedschaft
+    if age < 14:
+        price = child_price
+    elif 14 <= age <= 17:
+        price = youth_discount_price
     else:
-        # Erwachsenentarif basierend auf Mitgliedschaft
-        preis = erwachsenenpreise.get(mitgliedschaft, 5)
+        price = adult_prices.get(membership, 5)
         # Aufschlag für Sektoption für Premium-Mitglieder
-        if mitgliedschaft == "premium" and ist_premium_erwachsener_sekt:
-            preis += 0.75
+        if membership == "premium" and is_premium_with_sekt:
+            price += 0.75
 
-    # Anpassung für Ticketdauer-Optionen
-    if ticket_dauer == "halbtags":
-        if alter < 14:
-            preis = tagesticket_preise["kind"]["ganztag"] / 2
-        elif 14 <= alter <= 17:
-            preis = tagesticket_preise["jugendlich"]["ganztag"] / 2
+    # Anpassung des Preises je nach Ticketdauer
+    if ticket_duration == "half-day":
+        if age < 14:
+            price = day_ticket_prices["child"]["full-day"] / 2
+        elif 14 <= age <= 17:
+            price = day_ticket_prices["youth"]["full-day"] / 2
         else:
-            preis = tagesticket_preise["erwachsener"].get(mitgliedschaft,
-                                                          tagesticket_preise["erwachsener"]["ganztag"]) / 2
+            price = day_ticket_prices["adult"].get(membership, day_ticket_prices["adult"]["full-day"]) / 2
     else:
-        # Ganztagesticket-Preise
-        if alter < 14:
-            preis = tagesticket_preise["kind"]["ganztag"]
-        elif 14 <= alter <= 17:
-            preis = tagesticket_preise["jugendlich"]["ganztag"]
+        if age < 14:
+            price = day_ticket_prices["child"]["full-day"]
+        elif 14 <= age <= 17:
+            price = day_ticket_prices["youth"]["full-day"]
         else:
-            preis = tagesticket_preise["erwachsener"].get(mitgliedschaft, tagesticket_preise["erwachsener"]["ganztag"])
+            price = day_ticket_prices["adult"].get(membership, day_ticket_prices["adult"]["full-day"])
 
-    return preis
+    return price
 
 
 def main():
     while True:
-        # Eingabe des Alters vom Nutzer
+        # Sprachwahl
         try:
-            alter = int(input("Bitte geben Sie das Alter ein: "))
-            if alter < 0:
-                print("Ungültiges Alter. Bitte versuchen Sie es erneut.")
+            language = input("en/de? ").strip().lower()
+            if language not in languages:
+                print("Not a valid Language!")
                 continue
         except ValueError:
-            print("Ungültige Eingabe. Bitte geben Sie ein gültiges Alter ein.")
+            print("Not a valid Language, please enter (en/de)")
             continue
 
-        # Mitgliedschaftsart für Erwachsene abfragen
-        if alter >= 18:
-            mitgliedschaft = input("Geben Sie die Mitgliedschaft an (premium/basis/keine): ").strip().lower()
-            ist_premium_erwachsener_sekt = (mitgliedschaft == "premium" and input(
-                "Möchten Sie ein Glas Sekt für 0,75 € hinzufügen? (ja/nein): ").strip().lower() == "ja")
+        # Laden der Übersetzungstexte für die gewählte Sprache
+        text = languages[language]
+
+        # Eingabe des Alters
+        try:
+            age = int(input(text["enter_age"]))
+            if age < 0:
+                print(text["invalid_age"])
+                continue
+        except ValueError:
+            print(text["invalid_input"])
+            continue
+
+        # Abfrage der Mitgliedschaft und Sektoption für Erwachsene
+        if age >= 18:
+            membership = input(text["membership_prompt"]).strip().lower()
+            is_premium_with_sekt = (membership == "premium" and
+                                    input(text["add_sekt"]).strip().lower() == ("ja" if language == "de" else "yes"))
         else:
-            mitgliedschaft = "keine"  # Keine Mitgliedschaft für Kinder/Jugendliche
-            ist_premium_erwachsener_sekt = False
+            membership = "none"
+            is_premium_with_sekt = False
 
-        # Ticketdauer auswählen
-        ticket_dauer = input("Wählen Sie die Ticketdauer (halbtags/ganztag): ").strip().lower()
-        if ticket_dauer not in ["halbtags", "ganztag"]:
-            print("Ungültige Option. Es wird standardmäßig ein Ganztagesticket ausgewählt.")
-            ticket_dauer = "ganztag"
+        # Abfrage der Ticketdauer
+        ticket_duration = input(text["ticket_duration"]).strip().lower()
+        if ticket_duration not in ["half-day", "full-day", "halbtags", "ganztag"]:
+            print(text["invalid_option"])
+            ticket_duration = "ganztag" if language == "de" else "full-day"
 
-        # Tarif berechnen
-        preis = berechne_tarif(alter, mitgliedschaft, ist_premium_erwachsener_sekt, ticket_dauer)
-        print(f"Der berechnete Tarif beträgt: €{preis:.2f}")
+        # Berechnung des Preises
+        price = calculate_rate(age, membership, is_premium_with_sekt, ticket_duration)
+        print(f"{text['calculated_rate']}€{price:.2f}")
 
         # Abfrage, ob der Nutzer einen weiteren Tarif berechnen möchte
-        weiter = input("Möchten Sie einen weiteren Tarif abfragen? (ja/nein): ").strip().lower()
-        if weiter != "ja":
+        more = input(text["another_rate"]).strip().lower()
+        if more != ("ja" if language == "de" else "yes"):
             break
 
-    print("Vielen Dank! Wir wünschen Ihnen einen angenehmen Besuch.")
+    print(text["thank_you"])
 
 
 if __name__ == "__main__":
